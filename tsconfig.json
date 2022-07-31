@@ -1,0 +1,20 @@
+{
+  "exclude": ["node_modules", "*.js", "**/__mocks__/*"],
+  "compilerOptions": {
+    "removeComments": true,
+    "incremental": true,
+    "composite": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "downlevelIteration": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "outDir": "dist"
+  },
+  "include": ["src/**/*"]
+}
