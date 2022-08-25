@@ -7,6 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model EventWithoutEnum {
+  id String @id @default(dbgenerated("replace(replace(encode(substr(gen_random_uuid()::BYTES, 0, 16), 'base64'::STRING), '/'::STRING, '_'::STRING), '+'::STRING, '-'::STRING)"))
+  category String? // enum
+  coverImage String? // url
+  description String?
+  draft Boolean @default(true)
+  endDate DateTime
+  hostId String
+  hostName String?
+  minutesEarlyToOpen Int?
+  minutesLateToClose Int?
+  name String
+  numAttendees String?
+  privacy String?
+  professionalCategory String?
+  progress Int @default(0) // 0 - 100
+  spaceId String?
+  startDate DateTime
+  type String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model GatherEvent {
   // the @default value is ugly, but we can't create our own functions to abstract it. The string literals have to
   // be cast as ::STRING to avoid Prisma Migrate always thinking a new migration is required.
