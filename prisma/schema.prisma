@@ -3,11 +3,72 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "cockroachdb"
   url      = env("DATABASE_URL")
 }
 
 model GatherEvent {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // the @default value is ugly, but we can't create our own functions to abstract it. The string literals have to
+  // be cast as ::STRING to avoid Prisma Migrate always thinking a new migration is required.
+  // https://github.com/prisma/prisma/issues/14917
+  id String @id @default(dbgenerated("replace(replace(encode(substr(gen_random_uuid()::BYTES, 0, 16), 'base64'::STRING), '/'::STRING, '_'::STRING), '+'::STRING, '-'::STRING)"))
+  category GatherEventCategory? // enum
+  coverImage String? // url
+  description String?
+  draft Boolean @default(true)
+  endDate DateTime
+  hostId String
+  hostName String?
+  minutesEarlyToOpen Int?
+  minutesLateToClose Int?
   name String
+  numAttendees GatherEventAttendanceNumber?
+  privacy GatherEventPrivacy?
+  professionalCategory GatherEventProfessionalCategory?
+  progress Int @default(0) // 0 - 100
+  spaceId String?
+  startDate DateTime
+  type GatherEventUseCase?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum GatherEventCategory {
+  ProfessionalOrBusiness
+  CommunityOrOrganization
+  EducationOrAcademia
+  FriendsOrFamily
+  Other
+}
+
+// we have to combine all possible enum values into one since SQL doesn't support multiple enum types for a column
+enum GatherEventAttendanceNumber {
+  num_0_to_25
+  num_25_to_50
+  num_50_to_100
+  num_100_to_200
+  num_200_orMore
+  num_26_to_100Legacy
+  num_101_orMoreLegacy
+}
+
+enum GatherEventPrivacy {
+  public
+  private
+}
+
+enum GatherEventProfessionalCategory {
+  internal
+  external
+  NA
+}
+
+enum GatherEventUseCase {
+  PartyOrSocialGathering
+  TalkOrSeminar
+  ConferenceConventionOrExpo
+  MeetingOrNetworkingEvent
+  ClassOrWorkshop
+  Other
 }
