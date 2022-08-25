@@ -16,7 +16,8 @@ export const event = {
 };
 
 const run = async () => {
-  const { id } = await db.gatherEvent.create({ data: event  });
+  await db.gatherEvent.findFirst(); // pre-load enums
+  const { id } = await db.gatherEvent.create({ data: event });
 
   let updateCount = 0;
 
@@ -25,7 +26,6 @@ const run = async () => {
     const start = Date.now();
     await db.gatherEvent.update({ where: { id }, data: { progress: updateCount } });
     console.log("done in", Date.now() - start);
-    setTimeout(update, 0);
   };
 
   update();
